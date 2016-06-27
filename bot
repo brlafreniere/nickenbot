@@ -2,9 +2,12 @@
 
 import argparse
 
-from irc import Connection
+import irc
 
-Connection(nick="nickenbot", server="irc.snoonet.org")
+#Connection(nick="nickenbot", server="irc.snoonet.org")
+connection = irc.Connection()
+connection.connect()
+connection.recv_message()
 
 parser = argparse.ArgumentParser(description='A simple IRC bot.')
 args = parser.parse_args()
