@@ -1,5 +1,5 @@
 nick: nickenbot
-server: irc.snoonet.org
+server: 10.0.0.7
 port: 6667
 channels:
-    - ##coderhangout
+    - "#test"

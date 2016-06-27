@@ -2,7 +2,6 @@ import socket
 
 import config
 
-BUFSIZE = 512
 
 class Connection:
     def __init__(self, **kwargs):
@@ -14,5 +13,5 @@ class Connection:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((config.get('server'), config.get('port')))
 
-    def recv_message(self):
-        print(self.sock.recv(BUFSIZE))
+    def join_channel(self, channel):
+        self.sock.send("JOIN " + channel)
