@@ -1,0 +1,10 @@
+#!/usr/bin/env python
+
+import argparse
+
+from irc import Connection
+
+Connection(nick="nickenbot", server="irc.snoonet.org")
+
+parser = argparse.ArgumentParser(description='A simple IRC bot.')
+args = parser.parse_args()

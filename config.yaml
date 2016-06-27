@@ -1,0 +1,4 @@
+nick: nickenbot
+server: irc.snoonet.org
+channels:
+    - ##coderhangout
