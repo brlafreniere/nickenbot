@@ -1,39 +1,10 @@
 #!/usr/bin/env python
 
 import argparse
-import time
 
 import irc
-import config
-
-BUFSIZE = 512
-
-class Bot:
-    def __init__(self):
-        self.connection = irc.Connection()
-        self.connection.connect()
-        time.sleep(2)
-
-    def parse_message(self, message):
-        print("Received raw message: " + repr(message))
-        messages = message.split("\r\n")
-
-        print("Parsing messages...")
-        for m in messages:
-            print(repr(m))
-
-    def start(self):
-        for channel in config.get('channels'):
-            self.connection.join_channel(channel)
-
-        # start the neverending loop
-        while True:
-            message = self.connection.sock.recv(BUFSIZE)
-            self.parse_message(message)
-            time.sleep(1)
 
 parser = argparse.ArgumentParser(description='A simple IRC bot.')
 args = parser.parse_args()
 
-bot = Bot()
-bot.start()
+connection = irc.Connection()
