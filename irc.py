@@ -1,5 +1,6 @@
 import socket
 import time
+import re
 
 import config
 
@@ -12,20 +13,27 @@ class Connection:
 
         self.connect()
 
+        self.send_message("NICK " + config.get('nick'))
+        self.send_message("USER " + config.get('nick') + " ")
+
         for channel in config.get('channels'):
-            self.connection.join_channel(channel)
+            self.join_channel(channel)
 
         while True:
-            message = self.connection.sock.recv(BUFSIZE)
+            data = self.sock.recv(BUFSIZE)
+            if data:
+                self.parse_data(data)
+
+    def parse_data(self, data):
+        messages = data.split("\r\n")
+
+        for message in messages:
             if message:
-                self.parse_message(message)
+                print(" [R] <-  " + repr(message))
 
-    def parse_message(self, message):
-        messages = message.split("\r\n")
-
-        for msg in messages:
-            if msg:
-                print(" [RECV] <-- " + repr(m))
+                if re.match(r"^PING .*", message):
+                    self.pong(message)
+                
 
     def connect(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -33,9 +41,12 @@ class Connection:
         time.sleep(1)
 
     def join_channel(self, channel):
-        print("Joining channel: " + channel)
         self.send_message("JOIN " + channel)
 
     def send_message(self, message):
-        print(" [SEND] --> " + repr(message))
+        print(" [S]  -> " + repr(message))
         self.sock.send(message + "\r\n")
+
+    def pong(self, message):
+        ping_id = re.match(r"PING (.*)", message).group(1)
+        self.send_message("PONG " + ping_id)
