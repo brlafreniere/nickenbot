@@ -7,4 +7,4 @@ import irc
 parser = argparse.ArgumentParser(description='A simple IRC bot.')
 args = parser.parse_args()
 
-connection = irc.Connection()
+connection = irc.ServerConnection()
