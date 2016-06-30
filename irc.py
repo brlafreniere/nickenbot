@@ -6,6 +6,7 @@ import re
 import sys
 
 import config
+import command
 
 BUFSIZE = 512
 
@@ -15,13 +16,20 @@ class Connection:
 
     def parse_messages(self, messages):
         for message in messages:
+            result = re.match(r".*PRIVMSG ([^\s]+) :%s([\w]+)[\s]*(.*)" % config.get("command_prefix"), message)
+            if result:
+                command.execute(result.group(1), result.group(2), result.group(3), self)
+                break
+            if command.register.check(message):
+                command.register.trigger(message)
+                break
             if re.match(r"^PING .*", message):
                 self.pong(message)
                 break
-            if re.search(r".*001 %s.*" % config.get("nick"), message):
+            if re.search(r"001 %s" % config.get("nick"), message):
                 self.join_config_channels()
                 break
-            if re.match(r".*NOTICE.*nickname.*registered.*", message):
+            if re.search(r"NOTICE.*nickname.*registered", message):
                 self.identify_with_nickserv()
                 break
             if not self.registered:
