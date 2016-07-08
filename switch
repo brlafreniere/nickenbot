@@ -1,5 +1,0 @@
-#!/bin/bash
-
-cp ${1}.config.yaml config.yaml
-
-cat config.yaml
