@@ -29,9 +29,6 @@ class ActionTrigger:
 class MessageInterpreter:
     def __init__(self, servconn):
 
-        def bot_command(regex_match):
-
-
         # Bot command action
         # :blaine!blaine@Clk-E28261F1 PRIVMSG #test :.tell
         ActionTrigger(
