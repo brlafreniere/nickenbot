@@ -6,9 +6,6 @@ import re
 import sys
 
 import config
-import command
-import irc
-import parsing
 
 BUFSIZE = 512
 
@@ -23,7 +20,6 @@ class ServerConnection:
 
         self.create_socket()
         ServerConnection.connections.append(self)
-        self.start_loop()
 
 
     def create_socket(self):
@@ -44,8 +40,6 @@ class ServerConnection:
         log_messages(messages, True)
 
         return messages
-
-
 
 def log_messages(messages, received=False):
     if type(messages) is str:

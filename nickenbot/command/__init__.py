@@ -2,8 +2,9 @@ import os
 import string
 import importlib
 import traceback
+from .. import irc
 
-def execute(connection, **kwargs):
+def execute(**kwargs):
     print (kwargs['command'] + " command received.")
 
     module_string = string.join([__name__, kwargs['command']], '.')
@@ -14,6 +15,6 @@ def execute(connection, **kwargs):
         module = importlib.import_module(module_string)
     except ImportError as e:
         traceback.print_exc()
-        connection.send_to_channel(kwargs['channel'], "No such command.")
+        irc.send_to_channel(kwargs['channel'], "No such command.")
 
     module.execute(**kwargs)

@@ -2,8 +2,7 @@ import re
 
 import config
 import command
-
-from connection import ServerConnection
+import irc
 
 class ActionTrigger:
     action_triggers = []
@@ -20,33 +19,36 @@ class ActionTrigger:
         if match:
             self.execute_action(match)
             if self.run_once:
-                action_triggers.remove(self)
+                ActionTrigger.action_triggers.remove(self)
 
     def execute_action(self, match_object):
         self.action(match_object)
         if self.run_once:
-            action_triggers.remove(self)
+            ActionTrigger.action_triggers.remove(self)
 
 class MessageInterpreter:
     def __init__(self, servconn):
+
+        def bot_command(regex_match):
+
 
         # Bot command action
         # :blaine!blaine@Clk-E28261F1 PRIVMSG #test :.tell
         ActionTrigger(
             regex=r":(\w*)!.*.*PRIVMSG ([^\s]+) :%s([\w]+)[\s]*(.*)" % re.escape(config.get('command_prefix')),
-            action=lambda match: command.execute(connection, caller_nick=match.group(1), channel=match.group(2), command=match.group(3), arguments=match.group(4))
+            action=lambda match_object: command.execute(caller_nick=match_object.group(1), channel=match.group(2), command=match.group(3), arguments=match.group(4))
         )
 
         # Pinging
         ActionTrigger(
             regex=r"^PING .*",
-            action=lambda match: servconn.pong(match.group(0))
+            action=lambda match_object: irc.pong(match.group(0))
         )
 
         # Connection accepted (AKA RPL_WELCOME, status 001)
         ActionTrigger(
             regex=r".* 001 %s" % config.get('nick'),
-            action=lambda match: servconn.join_config_channels()
+            action=lambda match: irc.join_config_channels()
         )
 
         # Nickname registered already
