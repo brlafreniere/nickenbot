@@ -3,6 +3,8 @@ import re
 import config
 import command
 
+from connection import ServerConnection
+
 class ActionTrigger:
     action_triggers = []
 
@@ -26,31 +28,31 @@ class ActionTrigger:
             action_triggers.remove(self)
 
 class MessageInterpreter:
-    def __init__(self, connection):
-        self.connection = connection
+    def __init__(self, servconn):
 
         # Bot command action
+        # :blaine!blaine@Clk-E28261F1 PRIVMSG #test :.tell
         ActionTrigger(
-            regex=r".*PRIVMSG ([^\s]+) :%s([\w]+)[\s]*(.*)" % config.get('command_prefix'),
-            action=lambda match: command.execute(connection, channel=match.group(1), command=match.group(2), arguments=match.group(3))
+            regex=r":(\w*)!.*.*PRIVMSG ([^\s]+) :%s([\w]+)[\s]*(.*)" % re.escape(config.get('command_prefix')),
+            action=lambda match: command.execute(connection, caller_nick=match.group(1), channel=match.group(2), command=match.group(3), arguments=match.group(4))
         )
 
         # Pinging
         ActionTrigger(
             regex=r"^PING .*",
-            action=lambda match: self.connection.pong(match.group(0))
+            action=lambda match: servconn.pong(match.group(0))
         )
 
         # Connection accepted (AKA RPL_WELCOME, status 001)
         ActionTrigger(
             regex=r".* 001 %s" % config.get('nick'),
-            action=lambda match: self.connection.join_config_channels()
+            action=lambda match: servconn.join_config_channels()
         )
 
         # Nickname registered already
         ActionTrigger(
             regex=r"NOTICE.*nickname.*registered",
-            action=lambda match: self.connection.identify_with_nickserv()
+            action=lambda match: servconn.identify_with_nickserv()
         )
     
     def process_messages(self, messages):
