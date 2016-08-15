@@ -4,58 +4,68 @@ import config
 import command
 import irc
 
-class ActionTrigger:
-    action_triggers = []
+class Action:
+    actions = []
 
     def __init__(self, run_once=False, **kwargs):
         self.regex = kwargs['regex']
         self.action = kwargs['action']
         self.run_once = run_once
 
-        ActionTrigger.action_triggers.append(self)
+    def execute(self, action_mo):
+        self.action(action_mo)
 
-    def check(self, message):
-        match = re.match(self.regex, message)
-        if match:
-            self.execute_action(match)
+    def check_match_and_execute(self, message):
+        action_mo = re.match(self.regex, message)
+        if action_mo:
+            self.action(action_mo)
             if self.run_once:
-                ActionTrigger.action_triggers.remove(self)
-
-    def execute_action(self, match_object):
-        self.action(match_object)
-        if self.run_once:
-            ActionTrigger.action_triggers.remove(self)
+                Action.actions.remove(self)
 
 class MessageInterpreter:
-    def __init__(self, servconn):
+    action_insertion_queue = []
+
+    @staticmethod
+    def register_default_actions():
+        def bot_command_action(bot_command_mo):
+            command.execute(
+                caller_nick=bot_command_mo.group(1),
+                channel=bot_command_mo.group(2),
+                command=bot_command_mo.group(3),
+                arguments=bot_command_mo.group(4)
+            )
 
         # Bot command action
         # :blaine!blaine@Clk-E28261F1 PRIVMSG #test :.tell
-        ActionTrigger(
-            regex=r":(\w*)!.*.*PRIVMSG ([^\s]+) :%s([\w]+)[\s]*(.*)" % re.escape(config.get('command_prefix')),
-            action=lambda match_object: command.execute(caller_nick=match_object.group(1), channel=match_object.group(2), command=match_object.group(3), arguments=match_object.group(4))
-        )
+        actions = [Action(
+            regex=r"^:([^\s]+)![^\s]+ PRIVMSG ([^\s]+) :%s([\w]+)[\s]*(.*)" % re.escape(config.get('command_prefix')),
+            action=bot_command_action
+        ),
 
         # Pinging
-        ActionTrigger(
+        Action(
             regex=r"^PING .*",
             action=lambda match_object: irc.pong(match_object.group(0))
-        )
+        ),
 
         # Connection accepted (AKA RPL_WELCOME, status 001)
-        ActionTrigger(
+        Action(
             regex=r".* 001 %s" % config.get('nick'),
             action=lambda match_object: irc.join_config_channels()
-        )
+        ),
 
         # Nickname registered already
-        ActionTrigger(
-            regex=r"NOTICE.*nickname.*registered",
-            action=lambda match_object: servconn.identify_with_nickserv()
-        )
+        # ':NickServ!NickServ@snoonet/services/NickServ NOTICE nickenbot :This nickname is registered and protected.  If it is your'
+
+        Action(
+            regex=r"^:NickServ!NickServ@[^\s]+ NOTICE %s :.*registered.*" % config.get('nick'),
+            action=lambda match_object: irc.identify_with_nickserv()
+        )]
+        Action.actions = actions
     
-    def process_messages(self, messages):
+    @staticmethod
+    def process_messages(messages):
         for message in messages:
-            for action_trigger in ActionTrigger.action_triggers:
-                if action_trigger.check(message):
+            for action in Action.actions:
+                if action.check_match_and_execute(message):
                     break

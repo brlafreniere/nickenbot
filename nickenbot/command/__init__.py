@@ -5,10 +5,7 @@ import traceback
 from .. import irc
 
 def execute(**kwargs):
-    print (kwargs['command'] + " command received.")
-
     module_string = string.join([__name__, kwargs['command']], '.')
-    print("Importing module: " + module_string)
 
     module = None
     try:
@@ -17,4 +14,5 @@ def execute(**kwargs):
         traceback.print_exc()
         irc.send_to_channel(kwargs['channel'], "No such command.")
 
-    module.execute(**kwargs)
+    if not module == None: 
+        module.execute(**kwargs)
