@@ -14,11 +14,14 @@ def execute(**kwargs):
         nick = bot_command_mo.group(1)
         message = bot_command_mo.group(2)
 
+        def action(match_object):
+            irc.send_to_channel(kwargs['channel'], "%s: %s sent you a message: %s" % (nick, kwargs['caller_nick'], message))
+
         # ':blaine!blaine@Clk-E28261F1 PRIVMSG #test :#tell'
         action = Action(
             run_once=True,
             regex=r"^:%s![^\s]+ PRIVMSG %s :.*" % (nick, kwargs['channel']),
-            action=lambda match: irc.send_to_channel(kwargs['channel'], kwargs['caller_nick'] + " said: " + message)
+            action=action
         )
         irc.send_to_channel(kwargs['channel'], "Ok, I will tell %s the next time I see them." % nick)
         MessageInterpreter.action_insertion_queue.append(action)
