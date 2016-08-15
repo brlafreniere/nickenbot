@@ -15,7 +15,7 @@ def execute(**kwargs):
         message = bot_command_mo.group(2)
 
         def action(match_object):
-        irc.send_to_channel(kwargs['channel'], "%s: %s wanted me to tell you: %s" % (nick, kwargs['caller_nick'], message))
+            irc.send_to_channel(kwargs['channel'], "%s: %s wanted me to tell you: %s" % (nick, kwargs['caller_nick'], message))
 
         # ':blaine!blaine@Clk-E28261F1 PRIVMSG #test :#tell'
         action = Action(
