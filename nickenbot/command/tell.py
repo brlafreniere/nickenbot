@@ -1,9 +1,10 @@
 import re
 
-from .. import config, irc
+from .. import irc
+from ..config import ConfigManager
 from ..parsing import Action, MessageInterpreter
 
-USAGE = config.get('command_prefix') + "tell <nick> <message>"
+USAGE = ConfigManager.get('command_prefix') + "tell <nick> <message>"
 
 def execute(**kwargs):
     # extract bot command + arguments:

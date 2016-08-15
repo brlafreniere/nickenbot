@@ -12,6 +12,9 @@ sys.path.append(project_dir)
 import nickenbot
 
 arg_parser = argparse.ArgumentParser(description='A simple IRC bot.')
+
+arg_parser.add_argument('-n', '--network', help="The name of the network you want to connect to (corresponds to a .yaml file in the config directory).")
+
 args = arg_parser.parse_args()
 
-nickenbot.run()
+nickenbot.run(network=args.network)

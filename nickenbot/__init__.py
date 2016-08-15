@@ -1,11 +1,10 @@
-import connection
-servconn = connection.ServerConnection()
+from parsing import MessageInterpreter, Action
+from connection import ServerConnection
 
 import irc
 
-from parsing import MessageInterpreter, Action
-
-def run():
+def run(**kwargs):
+    servconn = ServerConnection(network=kwargs['network'])
     MessageInterpreter.register_default_actions()
 
     while True:

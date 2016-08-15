@@ -1,6 +1,6 @@
 import re
 
-import config
+from config import ConfigManager
 import command
 import irc
 
@@ -38,7 +38,7 @@ class MessageInterpreter:
         # Bot command action
         # :blaine!blaine@Clk-E28261F1 PRIVMSG #test :.tell
         actions = [Action(
-            regex=r"^:([^\s]+)![^\s]+ PRIVMSG ([^\s]+) :%s([\w]+)[\s]*(.*)" % re.escape(config.get('command_prefix')),
+            regex=r"^:([^\s]+)![^\s]+ PRIVMSG ([^\s]+) :%s([\w]+)[\s]*(.*)" % re.escape(ConfigManager.get('command_prefix')),
             action=bot_command_action
         ),
 
@@ -50,7 +50,7 @@ class MessageInterpreter:
 
         # Connection accepted (AKA RPL_WELCOME, status 001)
         Action(
-            regex=r".* 001 %s" % config.get('nick'),
+            regex=r".* 001 %s" % ConfigManager.get('nick'),
             action=lambda match_object: irc.join_config_channels()
         ),
 
@@ -58,7 +58,7 @@ class MessageInterpreter:
         # ':NickServ!NickServ@snoonet/services/NickServ NOTICE nickenbot :This nickname is registered and protected.  If it is your'
 
         Action(
-            regex=r"^:NickServ!NickServ@[^\s]+ NOTICE %s :.*registered.*" % config.get('nick'),
+            regex=r"^:NickServ!NickServ@[^\s]+ NOTICE %s :.*registered.*" % ConfigManager.get('nick'),
             action=lambda match_object: irc.identify_with_nickserv()
         )]
         Action.actions = actions

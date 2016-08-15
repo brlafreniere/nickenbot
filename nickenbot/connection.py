@@ -5,26 +5,32 @@ import datetime
 import re
 import sys
 
-import config
+from config import ConfigManager
 
 BUFSIZE = 512
 
 class ServerConnection:
-    connections = []
+    instance = None
+
     def __init__(self, **kwargs):
-        self.registered = False
+        if not ServerConnection.instance:
+            ConfigManager.network = kwargs['network']
+            self.registered = False
+            self.create_socket()
+            ServerConnection.instance = self
+        else:
+            return ServerConnection.instance
 
-        print("Creating new IRC connection.")
-        print("YAML Configuration:")
-        config.display()
-
-        self.create_socket()
-        ServerConnection.connections.append(self)
-
+    @classmethod
+    def get(klass):
+        if klass.instance:
+            return klass.instance
+        else:
+            return ServerConnection()
 
     def create_socket(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.connect((config.get('server'), config.get('port')))
+        self.sock.connect((ConfigManager.get('server'), ConfigManager.get('port')))
         time.sleep(1)
 
     def send_message(self, message, log=True):
