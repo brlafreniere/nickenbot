@@ -1,0 +1,5 @@
+#!/bin/bash
+
+NETWORK=snoonet
+
+nohup ./bin/bot -n $NETWORK 2>&1 > /dev/null &
