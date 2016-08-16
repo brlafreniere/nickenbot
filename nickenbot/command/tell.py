@@ -4,7 +4,7 @@ from .. import irc
 from ..config import ConfigManager
 from ..parsing import Action, MessageInterpreter
 
-USAGE = ConfigManager.get('command_prefix') + "tell <nick> <message>"
+USAGE = "Usage: %s tell <nick> <message>" % ConfigManager.get('command_prefix')
 
 def execute(**kwargs):
     # extract bot command + arguments:
