@@ -23,7 +23,10 @@ def execute(**kwargs):
         module = importlib.import_module(module_string)
     except ImportError as e:
         traceback.print_exc()
-        irc.send_to_channel(kwargs['channel'], "No such command.")
+        irc.send_to_channel(kwargs['channel'], "Command not available.")
 
-    if not module == None: 
+    if "execute" in dir(module):
         module.execute(**kwargs)
+    elif not module == None:
+        irc.send_to_channel(kwargs['channel'], "No output.")
+
