@@ -38,7 +38,7 @@ class MessageInterpreter:
         # Bot command action
         # :blaine!blaine@Clk-E28261F1 PRIVMSG #test :.tell
         actions = [Action(
-            regex=r"^:([^\s]+)![^\s]+ PRIVMSG ([^\s]+) :%s([\w]+)[\s]*(.*)" % re.escape(ConfigManager.get('command_prefix')),
+            regex=r"^:([^\s]+)![^\s]+ PRIVMSG ([^\s]+) :%s([\w-]+)[\s]*(.*)" % re.escape(ConfigManager.get('command_prefix')),
             action=bot_command_action
         ),
 
