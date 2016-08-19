@@ -31,14 +31,14 @@ class MessageInterpreter:
             command.execute(
                 caller_nick=bot_command_mo.group(1),
                 channel=bot_command_mo.group(2),
-                command=bot_command_mo.group(3),
-                arguments=bot_command_mo.group(4)
+                command=bot_command_mo.group(4),
+                arguments=bot_command_mo.group(5)
             )
 
-        # Bot command action
-        # :blaine!blaine@Clk-E28261F1 PRIVMSG #test :.tell
+        command_prefix_esc = re.escape(ConfigManager.get('command_prefix'))
+        nick_esc = re.escape(ConfigManager.get('nick'))
         actions = [Action(
-            regex=r"^:([^\s]+)![^\s]+ PRIVMSG ([^\s]+) :%s([\w-]+)[\s]*(.*)" % re.escape(ConfigManager.get('command_prefix')),
+            regex=r"^:([^\s]+)![^\s]+ PRIVMSG ([^\s]+) :(%s|%s: )([\w-]+)[\s]*(.*)" % (command_prefix_esc, nick_esc),
             action=bot_command_action
         ),
 
